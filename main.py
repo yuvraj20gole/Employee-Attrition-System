@@ -1,14 +1,17 @@
 import pandas as pd
 import seaborn as sns
 import matplotlib
-matplotlib.use('Agg')  # Use non-GUI backend to avoid Tkinter errors
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score , classification_report , roc_auc_score
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+
 
 # Loading the Dataset
 df = pd.read_csv('src/data/raw/data/WA_Fn-UseC_-HR-Employee-Attrition.csv')
@@ -104,6 +107,25 @@ print(classification_report(Y_test, rf_prediction))
 # Using roc_auc_score to Evaluate the Model
 print('Logistical Regression ROC-AUC', roc_auc_score(Y_test, lr_prediction))
 print('Random Forest ROC-AUC', roc_auc_score(Y_test, rf_prediction))
+
+# Train the Decision Tree
+dt_model = DecisionTreeClassifier(max_depth=5, random_state=42)
+dt_model.fit(X_train, Y_train)
+dt_prediction = dt_model.predict(X_test)
+
+# Accuracy and Report
+print('Decision Tree Accuracy:', accuracy_score(Y_test, dt_prediction))
+print(classification_report(Y_test, dt_prediction))
+
+# Confusion Matrix
+dt_cm = confusion_matrix(Y_test, dt_prediction)
+disp_dt = ConfusionMatrixDisplay(confusion_matrix=dt_cm, display_labels=['No', 'Yes'])
+disp_dt.plot(cmap='Oranges')
+plt.title('Confusion Matrix - Decision Tree')
+plt.show()
+
+# ROC-AUC
+print('Decision Tree ROC-AUC:', roc_auc_score(Y_test, dt_prediction))
 
 # Feature  Importance Visualisation for Random Forest Model
 # This helps to understand which features contribute to the Predictions
